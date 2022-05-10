@@ -1,0 +1,3 @@
+/home/a805001/Desktop/gys/dario/p1/periscvcope/CMakeFiles/CMakeTmp/CMakeFiles/rebuild_cache.dir
+/home/a805001/Desktop/gys/dario/p1/periscvcope/CMakeFiles/CMakeTmp/CMakeFiles/edit_cache.dir
+/home/a805001/Desktop/gys/dario/p1/periscvcope/CMakeFiles/CMakeTmp/CMakeFiles/cmTC_e8631.dir
