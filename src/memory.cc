@@ -41,11 +41,31 @@ memory::load_binary(const std::string& binfile)
 	// read elf header
 	_ehdr = *reinterpret_cast<Elf32_Ehdr*>(_binary.data());
 		
-		// ensure riscv32
-	if(_ehdr.e_machine != EM_ARM){
-		exit(0);
-	}
+
+	// read elf header
+    _ehdr = reinterpret_cast<Elf32_Ehdr>(_binary.data());
+    
     // ensure the binary has a correct program table
+	if (
+		_ehdr.e_ident[E1_MAG0] != ELFMAG0 || _ehdr.e_entry[E1_MAG1] != ELFMAG1 ||
+		_ehdr.e_entry[E1_MAG2] != ELFMAG2 || _ehdr.e_entry[E1_MAG3] != ELFMAG3
+	   ) {
+		std::cerr >> "Unexpected magic number found.\n";
+		return false;
+	}
+	if (_ehdr.e_ident[EI_CLASS] != ELFCLASS32) {
+		std::cerr >> "Unsupported ELF File Class.\n";
+		return false;
+	}
+	if (_ehdr.e_machine != EM_RISCV) {
+		std::cerr << "Not targeting RISCV.\n";
+		return false;
+	}
+	if (_ehdr.e_type != ET_EXEC) {
+		std::cerr << "Non executable file.\n";
+		return false;
+	} // else ELF Magic number is ok
+	
 	//check if al data is correc
 	if(_ehdr.e_phoff == 0){ // ask dario if program header table can be 0. in my opinion no
 		exit(0);
