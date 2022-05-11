@@ -88,16 +88,22 @@ memory::load_binary(const std::string& binfile)
 	}else{
 		numEntries = _ehdr.e_phnum;
 	}
-	// load sections in memory																									/**Es esto ?¿?¿?¿ I dont sure
+	// load sections headers in memory																									/**Es esto ?¿?¿?¿ I dont sure
+	auto offset = _ehdr.e_phoff;
 	for(int i = 0; i < numEntries; i++){
 		//binario +offset + offsetelement
-		Elf32_Phdr phdr = *reinterpret_cast<Elf32_Phdr*>(_binary.data() + _ehdr.e_phoff + (_ehdr.e_phentsize * i));
+		Elf32_Phdr phdr = *reinterpret_cast<Elf32_Phdr*>(_binary.data() + offset + (_ehdr.e_phentsize * i));
 		_phdr.push_back(phdr);
+		if (phdr.p_type == PT_PHDR)
+			offset = phdr.p_offset - (_ehdr.e_phentsize * (i + 1));
 	}
+
+	// Save each of the segments in the class member _segments
 	for(int i = 0; i < _phdr.size(); i++){
 		Elf32_Phdr phdr = _phdr[i];
 		if(phdr.p_type == PT_LOAD){
-			segment seg = *reinterpret_cast<segment*>(phdr.p_vaddr);
+			std::vector<uint8_t> _raw_data(_binary.begin() + phdr.p_offset, _binary.begin() + phdr.p_offset + phdr.p_filesz);
+			segment seg = segment(phdr.p_offset, _raw_data);
 		    _segments.push_back(seg);
 
 		}else{
@@ -126,6 +132,3 @@ memory::load_binary(const std::string& binfile)
   	// ... to be completed
 
 }
-
-
-
