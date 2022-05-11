@@ -94,6 +94,7 @@ memory::load_binary(const std::string& binfile)
 		Elf32_Phdr phdr = *reinterpret_cast<Elf32_Phdr*>(_binary.data() + _ehdr.e_phoff + (_ehdr.e_phentsize * i));
 		_phdr.push_back(phdr);
 	}
+	
 	for(int i = 0; i < _phdr.size(); i++){
 		Elf32_Phdr phdr = _phdr[i];
 		if(phdr.p_type == PT_LOAD){
