@@ -41,23 +41,51 @@ class r_instruction : public instruction {
 };
 
 class i_instruction : public instruction {
-    // ...
+    public:
+        r_instruction(uint32_t bitstream) :
+            instruction(bitstream, type::i) {}
+        constexpr uint8_t rd() const { return bits(7, 6); }
+        constexpr uint8_t funct3() const { return bits(12, 3); }
+        constexpr uint8_t rs1() const { return bits(15, 5); }
+        constexpr uint32_t imm() const { return bits(20, 12); } // imm[11:0]
 };
 
 class s_instruction : public instruction {
-    // ...
+    public:
+        r_instruction(uint32_t bitstream) :
+            instruction(bitstream, type::r) {}
+        constexpr uint8_t imm() const { return bits(7, 5); } // imm[4:0]
+        constexpr uint8_t funct3() const { return bits(12, 3); }
+        constexpr uint8_t rs1() const { return bits(15, 5); }
+        constexpr uint8_t rs2() const { return bits(20, 5); }
+        constexpr uint32_t imm() const { return bits(25, 7); } // imm[11:5] 
 };
 
 class b_instruction : public instruction {
-    // ...
+    public:
+        r_instruction(uint32_t bitstream) :
+            instruction(bitstream, type::r) {}
+        constexpr uint8_t imm() const { return bits(7, 5); } // imm[4:1|11] 
+        constexpr uint8_t funct3() const { return bits(12, 3); }
+        constexpr uint8_t rs1() const { return bits(15, 5); }
+        constexpr uint8_t rs2() const { return bits(20, 5); }
+        constexpr uint32_t imm() const { return bits(25, 7); } // imm[12|10:5] 
 };
 
 class u_instruction : public instruction {
-    // ...
+    public:
+        r_instruction(uint32_t bitstream) :
+            instruction(bitstream, type::i) {}
+        constexpr uint8_t rd() const { return bits(7, 5); }
+        constexpr uint32_t imm() const { return bits(20, 12); } // imm[31:12]
 };
 
 class j_instruction : public instruction {
-    // ...
+    public:
+        r_instruction(uint32_t bitstream) :
+            instruction(bitstream, type::i) {}
+        constexpr uint8_t rd() const { return bits(7, 5); }
+        constexpr uint32_t imm() const { return bits(20, 12); } // imm[20|10:1|11|19:12]
 };
 
 
