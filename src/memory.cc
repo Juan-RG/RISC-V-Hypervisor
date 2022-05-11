@@ -35,7 +35,7 @@ memory::load_binary(const std::string& binfile)
 			ifile_iter());
 	ifile.close();
 
-	std::cout << _binary[0] << "\n";
+	//std::cout << _binary[0] << "\n";
 	
 	
 	// read elf header
@@ -74,7 +74,28 @@ memory::load_binary(const std::string& binfile)
 		Elf32_Phdr phdr = *reinterpret_cast<Elf32_Phdr*>(_binary.data() + _ehdr.e_phoff + (_ehdr.e_phentsize * i));
 		_phdr.push_back(phdr);
 	}
+	for(int i = 0; i < _phdr.size(); i++){
+		Elf32_Phdr phdr = _phdr[i];
+		if(phdr.p_type == PT_LOAD){
+			segment seg = *reinterpret_cast<segment*>(phdr.p_vaddr);
+		    _segments.push_back(seg);
 
+		}else{
+			std::cout << "Segment != PT_LOAD" << std::endl;
+			continue;
+		}
+		long sizeSegment = 0;
+		if(phdr.p_memsz > phdr.p_filesz){
+			std::cout << "Entro p_memsz > p_filesz" << std::endl;
+			sizeSegment = phdr.p_filesz;
+			sizeSegment = sizeSegment | ((long)phdr.p_memsz << 32);
+		}else{
+			sizeSegment = phdr.p_filesz;
+		}
+
+	}
+
+	for
     // entry point
 	if(_ehdr.e_entry == 0){
 		exit(0);
@@ -88,31 +109,3 @@ memory::load_binary(const std::string& binfile)
 
 
 
-bool elf_check_supported(Elf32_Ehdr *hdr) {
-	if(hdr->e_ident[EI_CLASS] != ELFCLASS32) {
-		exit(2);
-		//ERROR("Unsupported ELF File Class.\n");
-		return false;
-	}
-	if(hdr->e_ident[EI_DATA] != ELFDATA2LSB) {
-		exit(2);
-		//ERROR("Unsupported ELF File byte order.\n");
-		return false;
-	}
-	if(hdr->e_machine != EM_386) {
-		exit(2);
-		//ERROR("Unsupported ELF File target.\n");
-		return false;
-	}
-	if(hdr->e_ident[EI_VERSION] != EV_CURRENT) {
-		exit(2);
-		//ERROR("Unsupported ELF File version.\n");
-		return false;
-	}
-	if(hdr->e_type != ET_REL && hdr->e_type != ET_EXEC) {
-		exit(2);
-		//ERROR("Unsupported ELF File type.\n");
-		return false;
-	}
-	return true;
-}
