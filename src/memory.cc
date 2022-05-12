@@ -42,69 +42,112 @@ memory::load_binary(const std::string& binfile)
 	_ehdr = *reinterpret_cast<Elf32_Ehdr*>(_binary.data());
 		
 
-	// read elf header
-    _ehdr = reinterpret_cast<Elf32_Ehdr>(_binary.data());
-    
+ 
     // ensure the binary has a correct program table
 	if (
-		_ehdr.e_ident[E1_MAG0] != ELFMAG0 || _ehdr.e_entry[E1_MAG1] != ELFMAG1 ||
-		_ehdr.e_entry[E1_MAG2] != ELFMAG2 || _ehdr.e_entry[E1_MAG3] != ELFMAG3
+		_ehdr.e_ident[EI_MAG0] != ELFMAG0 || _ehdr.e_ident[EI_MAG1] != ELFMAG1 ||
+		_ehdr.e_ident[EI_MAG2] != ELFMAG2 || _ehdr.e_ident[EI_MAG3] != ELFMAG3
 	   ) {
-		std::cerr >> "Unexpected magic number found.\n";
-		return false;
+		std::cerr << "Unexpected magic number found.\n";
+		//exit(0);
 	}
 	if (_ehdr.e_ident[EI_CLASS] != ELFCLASS32) {
-		std::cerr >> "Unsupported ELF File Class.\n";
-		return false;
+		std::cerr << "Unsupported ELF File Class.\n";
+		//exit(0);
+	}
+	if (_ehdr.e_ident[EI_VERSION] != EV_CURRENT) {
+		std::cerr << "Invalid version\n";
+		//exit(0);
 	}
 	if (_ehdr.e_machine != EM_RISCV) {
 		std::cerr << "Not targeting RISCV.\n";
-		return false;
+		//exit(0);
 	}
-	if (_ehdr.e_type != ET_EXEC) {
+	//si es exec o shared good
+	if (!(_ehdr.e_type == ET_EXEC && _ehdr.e_type == ET_DYN)) {
 		std::cerr << "Non executable file.\n";
-		return false;
+		//exit(0);
 	} // else ELF Magic number is ok
 	
+	if (_ehdr.e_version != EV_CURRENT) {
+		std::cerr << "Invalid version 2 \n";
+		//exit(0);
+	}
+	
+
 	//check if al data is correc
 	if(_ehdr.e_phoff == 0){ // ask dario if program header table can be 0. in my opinion no
-		exit(0);
+		std::cerr << "Invalid phoff == 0 \n";
+		//exit(0);
 	}
 	if(_ehdr.e_phnum == 0){
-		exit(0);
+		std::cerr << "Invalid e_phnum == 0 \n";
+		//exit(0);
 	}
-
+   
 	//check size because register depends of it
 	int numEntries = 0;
 	Elf32_Shdr _shdr;
 	if(_ehdr.e_phnum >= PN_XNUM){
 		//Check error
 		if(_ehdr.e_shoff == 0){
+			std::cerr << "Invalid phoff == 0 \n";
 			exit(0);
 		}
 		//cast and get data
-		Elf32_Shdr _shdr = *reinterpret_cast<Elf32_Shdr*>(_binary.data() + _ehdr.e_shoff);
+		_shdr = *reinterpret_cast<Elf32_Shdr*>(_binary.data() + _ehdr.e_shoff);
 		numEntries = _shdr.sh_info;
+
 	}else{
 		numEntries = _ehdr.e_phnum;
 	}
-	// load sections in memory																									/**Es esto ?¿?¿?¿ I dont sure
+	// load sections headers in memory																									
+
 	for(int i = 0; i < numEntries; i++){
 		//binario +offset + offsetelement
 		Elf32_Phdr phdr = *reinterpret_cast<Elf32_Phdr*>(_binary.data() + _ehdr.e_phoff + (_ehdr.e_phentsize * i));
 		_phdr.push_back(phdr);
+		if(phdr.p_type == PT_NULL){
+			continue;
+		}else if(phdr.p_type == PT_LOAD){
+			if(phdr.p_filesz == 0){
+				std::cerr << "Segment for program header p_filessz == 0 \n";
+			}
+			//Control de flags para saber si
+			//PF_x - executable
+			//PF_W - Writable
+			//PF_R - Readable
+			segment firstSegment = segment(__binary.data() + phdr.p_offset, phdr.p_filesz);
+			_segments.push_back(firstSegment);
+		}
 	}
-	
-	for(int i = 0; i < _phdr.size(); i++){
+
+
+/* Torres version v1	
+	auto offset = _ehdr.e_phoff;
+	for(int i = 0; i < numEntries; i++){
+		//binario +offset + offsetelement
+		Elf32_Phdr phdr = *reinterpret_cast<Elf32_Phdr*>(_binary.data() + offset + (_ehdr.e_phentsize * i));
+		_phdr.push_back(phdr);
+		if (phdr.p_type == PT_PHDR){
+			offset = phdr.p_offset - (_ehdr.e_phentsize * (i + 1));
+		}
+	}
+*/
+
+/* Juan segmentos v1
+	for(size_t i = 0; i < _phdr.size(); i++){
 		Elf32_Phdr phdr = _phdr[i];
 		if(phdr.p_type == PT_LOAD){
-			segment seg = *reinterpret_cast<segment*>(phdr.p_vaddr);
+			//std::vector<uint8_t> _raw_data(_binary.begin() + phdr.p_offset, _binary.begin() + phdr.p_offset + phdr.p_filesz);
+			segment seg = segment(static_cast<address_t>(phdr.p_offset), phdr.p_filesz);
 		    _segments.push_back(seg);
 
 		}else{
 			std::cout << "Segment != PT_LOAD" << std::endl;
 			continue;
 		}
+	
 		long sizeSegment = 0;
 		if(phdr.p_memsz > phdr.p_filesz){
 			std::cout << "Entro p_memsz > p_filesz" << std::endl;
@@ -114,19 +157,11 @@ memory::load_binary(const std::string& binfile)
 			sizeSegment = phdr.p_filesz;
 		}
 
-	}
+	}*/
 
-	for
-    // entry point
-	if(_ehdr.e_entry == 0){
-		exit(0);
-	}
 		// load sections in memory
   	
 	  // read ELF program header table,
   	// ... to be completed
 
 }
-
-
-
