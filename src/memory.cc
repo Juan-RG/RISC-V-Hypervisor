@@ -85,7 +85,7 @@ memory::load_binary(const std::string& binfile)
 		//exit(0);
 	}
    
-	//check size because register depends of it
+		//check size because register depends of it
 	int numEntries = 0;
 	Elf32_Shdr _shdr;
 	if(_ehdr.e_phnum >= PN_XNUM){
@@ -104,6 +104,7 @@ memory::load_binary(const std::string& binfile)
 	// load sections headers in memory																									
 
 	for(int i = 0; i < numEntries; i++){
+		std::cout << "SEGMENTOS"<< std::endl;
 		//binario +offset + offsetelement
 		Elf32_Phdr phdr = *reinterpret_cast<Elf32_Phdr*>(_binary.data() + _ehdr.e_phoff + (_ehdr.e_phentsize * i));
 		_phdr.push_back(phdr);
@@ -117,10 +118,26 @@ memory::load_binary(const std::string& binfile)
 			//PF_x - executable
 			//PF_W - Writable
 			//PF_R - Readable
-			segment firstSegment = segment(__binary.data() + phdr.p_offset, phdr.p_filesz);
+			segment firstSegment = segment(phdr.p_offset, phdr.p_filesz);
 			_segments.push_back(firstSegment);
 		}
 	}
+
+
+
+		  // read ELF program header table,
+	if(_ehdr.e_shoff == 0){
+			std::cerr << "Invalid e_shoff == 0 \n";
+			exit(0);
+	}	  
+	
+	_shdr = *reinterpret_cast<Elf32_Shdr*>(_binary.data() + _ehdr.e_shoff);
+
+	if(_shdr.sh_name != 1){
+		std::cout << "Fin "<< std::endl;
+	}
+	  // ... to be completed
+
 
 
 /* Torres version v1	
