@@ -119,6 +119,7 @@ memory::load_binary(const std::string& binfile)
 			//PF_W - Writable
 			//PF_R - Readable
 			segment firstSegment = segment(phdr.p_offset, phdr.p_filesz);
+			std::cout << "segmento  " << firstSegment._initial_address << std::endl;
 			_segments.push_back(firstSegment);
 		}
 	}
