@@ -125,7 +125,7 @@ memory::load_binary(const std::string& binfile)
 	}
 
 
-
+/******** No necesario
 		  // read ELF program header table,
 	if(_ehdr.e_shoff == 0){
 			std::cerr << "Invalid e_shoff == 0 \n";
@@ -137,8 +137,12 @@ memory::load_binary(const std::string& binfile)
 	if(_shdr.sh_name != 1){
 		std::cout << "Fin "<< std::endl;
 	}
-	  // ... to be completed
 
+
+	  // ... to be completed
+***********/
+
+	//_ehdr.e_entry @virutal de la primer instruccion habra que comparar con @virtual de los segmentos para escoger el 1 a ejecutar
 
 
 /* Torres version v1	
