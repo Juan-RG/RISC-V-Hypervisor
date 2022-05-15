@@ -1,0 +1,4 @@
+1. in an ELF binary, what is the difference between sections and segments?
+Las secciones contienen la información necesaria para linkear los programas mientras que los segmentos guardan los datos que se utilizaran en ejecución.
+2. Can an ELF binary have several loadable segments?
+Si puede tener varios
