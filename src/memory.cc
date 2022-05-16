@@ -118,9 +118,12 @@ memory::load_binary(const std::string& binfile)
 			//PF_x - executable
 			//PF_W - Writable
 			//PF_R - Readable
-			segment firstSegment = segment(phdr.p_offset, phdr.p_filesz);
-			std::cout << "segmento  " << firstSegment._initial_address << std::endl;
-			_segments.push_back(firstSegment);
+			segment _segment = segment(phdr.p_vaddr, phdr.p_memsz);
+			std::memcpy( reinterpret_cast<void *>( _segment._content.data() ),
+						 _binary.data() + phdr.p_offset,
+						 phdr.p_filesz );
+			std::cout << "Saved segment, Initial vAddr: " << _segment._initial_address << ", vSize: " << phdr.p_memsz << std::endl;
+			_segments.push_back(_segment);
 		}
 	}
 
