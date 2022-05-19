@@ -118,73 +118,15 @@ memory::load_binary(const std::string& binfile)
 			//PF_x - executable
 			//PF_W - Writable
 			//PF_R - Readable
-			segment firstSegment = segment(phdr.p_offset, phdr.p_filesz);
-			std::cout << "segmento  " << firstSegment._initial_address << std::endl;
-			_segments.push_back(firstSegment);
-			//std::memcopy(reinterpretar cast<void*> )
+
+			segment _segment = segment(phdr.p_vaddr, phdr.p_memsz);
+			std::memcpy(reinterpret_cast<void *>( _segment._content.data() ),
+						 _binary.data() + phdr.p_offset,
+						 phdr.p_filesz );
+			std::cout << "Saved segment, Initial vAddr: " << _segment._initial_address << ", vSize: " << phdr.p_memsz << std::endl;
+			_segments.push_back(_segment);
 		}
 	}
 
-
-/******** No necesario
-		  // read ELF program header table,
-	if(_ehdr.e_shoff == 0){
-			std::cerr << "Invalid e_shoff == 0 \n";
-			exit(0);
-	}	  
-	
-	_shdr = *reinterpret_cast<Elf32_Shdr*>(_binary.data() + _ehdr.e_shoff);
-
-	if(_shdr.sh_name != 1){
-		std::cout << "Fin "<< std::endl;
-	}
-
-
-	  // ... to be completed
-***********/
-
-	//_ehdr.e_entry @virutal de la primer instruccion habra que comparar con @virtual de los segmentos para escoger el 1 a ejecutar
-
-
-/* Torres version v1	
-	auto offset = _ehdr.e_phoff;
-	for(int i = 0; i < numEntries; i++){
-		//binario +offset + offsetelement
-		Elf32_Phdr phdr = *reinterpret_cast<Elf32_Phdr*>(_binary.data() + offset + (_ehdr.e_phentsize * i));
-		_phdr.push_back(phdr);
-		if (phdr.p_type == PT_PHDR){
-			offset = phdr.p_offset - (_ehdr.e_phentsize * (i + 1));
-		}
-	}
-*/
-
-/* Juan segmentos v1
-	for(size_t i = 0; i < _phdr.size(); i++){
-		Elf32_Phdr phdr = _phdr[i];
-		if(phdr.p_type == PT_LOAD){
-			//std::vector<uint8_t> _raw_data(_binary.begin() + phdr.p_offset, _binary.begin() + phdr.p_offset + phdr.p_filesz);
-			segment seg = segment(static_cast<address_t>(phdr.p_offset), phdr.p_filesz);
-		    _segments.push_back(seg);
-
-		}else{
-			std::cout << "Segment != PT_LOAD" << std::endl;
-			continue;
-		}
-	
-		long sizeSegment = 0;
-		if(phdr.p_memsz > phdr.p_filesz){
-			std::cout << "Entro p_memsz > p_filesz" << std::endl;
-			sizeSegment = phdr.p_filesz;
-			sizeSegment = sizeSegment | ((long)phdr.p_memsz << 32);
-		}else{
-			sizeSegment = phdr.p_filesz;
-		}
-
-	}*/
-
-		// load sections in memory
-  	
-	  // read ELF program header table,
-  	// ... to be completed
 
 }

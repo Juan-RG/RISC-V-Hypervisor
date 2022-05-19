@@ -8,7 +8,11 @@
 
 // extracted from the riscv-spec-20191213.pdf
 
+#include <iomanip>
+#include <iostream>
+
 namespace instrs {
+
 
 enum class type {base, r, i, s, b, u, j};
 
@@ -24,33 +28,48 @@ class instruction {
         }
         instruction(uint32_t bitstream, instrs::type type=type::base) : _type(type),
         _bitstream(bitstream) {}
-
+        //virtual ~instruction() {}	
         constexpr instrs::type type() const { return _type; }
         constexpr uint8_t opcode() const { return bits(0,7); }
+       // virtual void execute(processor &proc);
+       
 };
-
+/*
 class r_instruction : public instruction {
     public:
         r_instruction(uint32_t bitstream) :
             instruction(bitstream, type::r) {
             }
+        ~r_instruction() override{}    
         constexpr uint8_t rd() const { return bits(7, 5); }
         constexpr uint8_t funct3() const { return bits(12, 3); }
         constexpr uint8_t rs1() const { return bits(15, 5); }
         constexpr uint8_t rs2() const { return bits(20, 5); }
-        constexpr uint32_t funct7() const { return bits(27, 7); }
+        constexpr uint32_t funct7() const { return bits(25, 7); }
+        virtual void execute(processor &proc) override;
 };
-
+*/
 class i_instruction : public instruction {
+    private:
+      int32_t _imm;
     public:
         i_instruction(uint32_t bitstream) :
-            instruction(bitstream, type::i) {}
-        constexpr uint8_t rd() const { return bits(7, 6); }
+            instruction(bitstream, type::i) {
+            _imm = bits(31, 1) ? 0xFFFFF800 : 0x0;
+            if(bits(31, 1) == 1){
+                _imm = 0xFFFFF000;//FFFF F000  0xFFFFF800
+            }
+            _imm |= bits(20,12);
+        }
+       // ~i_instruction() override {}	
+        constexpr uint8_t rd() const { return bits(7, 5); }
         constexpr uint8_t funct3() const { return bits(12, 3); }
         constexpr uint8_t rs1() const { return bits(15, 5); }
         constexpr uint32_t imm() const { return bits(20, 12); } // imm[11:0]
+        //virtual void execute(processor &proc) override;
+        void execute(processor &proc);
 };
-
+/*
 class s_instruction : public instruction {
     private:
         uint32_t _imm;
@@ -98,6 +117,6 @@ class j_instruction : public instruction {
         constexpr uint8_t rd() const { return bits(7, 5); }
         constexpr uint32_t imm() const { return bits(20, 12); } // imm[20|10:1|11|19:12]
 };
-
+*/
 
 } // namespace instrs

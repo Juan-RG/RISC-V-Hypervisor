@@ -5,6 +5,12 @@
 #include <memory.hh>
 #include <processor.hh>
 
+
+
+#include <iomanip>
+#include <cstdint>
+
+
 using namespace instrs;
 using namespace mem;
 
@@ -35,9 +41,30 @@ int main(int argc, char *argv[])
    size_t exec_instrs = 0;
    do
    {
-       // main interpreter loop
-       // ...
-       exec_instrs++;
+       pc = proc.read_pc();   
+/*
+       auto instr = mem.read<instrs::instruction>(pc);
+       std::cout << std::setfill('0') << std::setw(8) << std::hex << instr.opcode() << '\n'; 
+*/
+       
+        uint32_t binaryInstr = mem.read<uint32_t>(pc);
+        auto opcode = binaryInstr & 0x7F;
+        switch (opcode)
+        {
+            //tipo R 0110011
+        case 19:
+            i_instruction* intruction = new i_instruction(binaryInstr);
+            intruction->execute(proc);
+            break;
+
+        }
+        
+
+
+/*        instr.execute(proc);
+        exec_instrs++;
+        next_pc = proc.next_pc();
+  */
    } while (next_pc != pc); // look for while(1) in the code
 
    std::cout << "Number of executed instructions: " << exec_instrs << std::endl;
