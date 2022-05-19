@@ -32,7 +32,8 @@ class instruction {
 class r_instruction : public instruction {
     public:
         r_instruction(uint32_t bitstream) :
-            instruction(bitstream, type::r) {}
+            instruction(bitstream, type::r) {
+            }
         constexpr uint8_t rd() const { return bits(7, 5); }
         constexpr uint8_t funct3() const { return bits(12, 3); }
         constexpr uint8_t rs1() const { return bits(15, 5); }
@@ -42,7 +43,7 @@ class r_instruction : public instruction {
 
 class i_instruction : public instruction {
     public:
-        r_instruction(uint32_t bitstream) :
+        i_instruction(uint32_t bitstream) :
             instruction(bitstream, type::i) {}
         constexpr uint8_t rd() const { return bits(7, 6); }
         constexpr uint8_t funct3() const { return bits(12, 3); }
@@ -51,20 +52,30 @@ class i_instruction : public instruction {
 };
 
 class s_instruction : public instruction {
+    private:
+        uint32_t _imm;
     public:
-        r_instruction(uint32_t bitstream) :
-            instruction(bitstream, type::r) {}
+        s_instruction(uint32_t bitstream) :
+        instruction(bitstream, type::s) {
+            _imm = bits(31, 1) ? 0xFFFFF800 : 0x0;
+            if(bits(31, 1) == 1){
+                _imm = 0xFFFFF800;
+            }
+        _imm |= bits(7,5);
+        _imm |= (bits(25,6) << 5);
+
+        }
         constexpr uint8_t imm() const { return bits(7, 5); } // imm[4:0]
         constexpr uint8_t funct3() const { return bits(12, 3); }
         constexpr uint8_t rs1() const { return bits(15, 5); }
         constexpr uint8_t rs2() const { return bits(20, 5); }
-        constexpr uint32_t imm() const { return bits(25, 7); } // imm[11:5] 
+        constexpr uint32_t imm() const { return _imm; } // imm[11:5] 
 };
 
 class b_instruction : public instruction {
     public:
-        r_instruction(uint32_t bitstream) :
-            instruction(bitstream, type::r) {}
+        b_instruction(uint32_t bitstream) :
+            instruction(bitstream, type::b) {}
         constexpr uint8_t imm() const { return bits(7, 5); } // imm[4:1|11] 
         constexpr uint8_t funct3() const { return bits(12, 3); }
         constexpr uint8_t rs1() const { return bits(15, 5); }
@@ -75,15 +86,15 @@ class b_instruction : public instruction {
 class u_instruction : public instruction {
     public:
         r_instruction(uint32_t bitstream) :
-            instruction(bitstream, type::i) {}
+            instruction(bitstream, type::u) {}
         constexpr uint8_t rd() const { return bits(7, 5); }
         constexpr uint32_t imm() const { return bits(20, 12); } // imm[31:12]
 };
 
 class j_instruction : public instruction {
     public:
-        r_instruction(uint32_t bitstream) :
-            instruction(bitstream, type::i) {}
+        j_instruction(uint32_t bitstream) :
+            instruction(bitstream, type::j) {}
         constexpr uint8_t rd() const { return bits(7, 5); }
         constexpr uint32_t imm() const { return bits(20, 12); } // imm[20|10:1|11|19:12]
 };

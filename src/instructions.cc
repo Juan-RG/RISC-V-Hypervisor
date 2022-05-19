@@ -4,4 +4,8 @@
 using namespace instrs;
 using namespace mem;
 
+using namespace std;
+
+
 // ...
+

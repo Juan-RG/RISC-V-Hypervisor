@@ -121,6 +121,7 @@ memory::load_binary(const std::string& binfile)
 			segment firstSegment = segment(phdr.p_offset, phdr.p_filesz);
 			std::cout << "segmento  " << firstSegment._initial_address << std::endl;
 			_segments.push_back(firstSegment);
+			//std::memcopy(reinterpretar cast<void*> )
 		}
 	}
 

@@ -20,6 +20,7 @@ int main(int argc, char *argv[])
 
    mem.load_binary(argv[1]);
 
+   
    // read the entry point
    // ...
 
