@@ -52,10 +52,20 @@ int main(int argc, char *argv[])
         switch (opcode)
         {
             //tipo R 0110011
+
+            
+            //tipo I 0010011
         case 19:
             i_instruction* intruction = new i_instruction(binaryInstr);
-            intruction->execute(proc);
+            intruction->execute(proc, mem);
             break;
+            //0100011
+        case 35:    
+            i_instruction* intruction2 = new i_instruction(binaryInstr);
+            intruction2->execute(proc, mem);
+            break;
+            //tipo S 1110011
+
 
         }
         

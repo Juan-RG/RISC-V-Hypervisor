@@ -32,6 +32,7 @@ class instruction {
         constexpr instrs::type type() const { return _type; }
         constexpr uint8_t opcode() const { return bits(0,7); }
        // virtual void execute(processor &proc);
+       //void execute(processor &proc, memory &mem);
        
 };
 /*
@@ -67,12 +68,12 @@ class i_instruction : public instruction {
         constexpr uint8_t rs1() const { return bits(15, 5); }
         constexpr uint32_t imm() const { return bits(20, 12); } // imm[11:0]
         //virtual void execute(processor &proc) override;
-        void execute(processor &proc);
+        void execute(processor &proc, memory &mem);
 };
-/*
+
 class s_instruction : public instruction {
     private:
-        uint32_t _imm;
+        int32_t _imm;
     public:
         s_instruction(uint32_t bitstream) :
         instruction(bitstream, type::s) {
@@ -81,16 +82,16 @@ class s_instruction : public instruction {
                 _imm = 0xFFFFF800;
             }
         _imm |= bits(7,5);
-        _imm |= (bits(25,6) << 5);
+        _imm |= (bits(25,7) << 5);
 
         }
-        constexpr uint8_t imm() const { return bits(7, 5); } // imm[4:0]
         constexpr uint8_t funct3() const { return bits(12, 3); }
         constexpr uint8_t rs1() const { return bits(15, 5); }
         constexpr uint8_t rs2() const { return bits(20, 5); }
         constexpr uint32_t imm() const { return _imm; } // imm[11:5] 
+        void execute(processor &proc, memory &mem);
 };
-
+/*
 class b_instruction : public instruction {
     public:
         b_instruction(uint32_t bitstream) :
