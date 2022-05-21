@@ -101,3 +101,15 @@ void s_instruction::execute(processor &proc, memory &mem)
  }
 // ...
 
+void j_instruction::execute(processor &proc, memory &mem)   {
+        uint8_t _funct = this->opcode();
+        uint8_t _rd = this->rd();
+        switch (_funct)
+        {
+            case 0b1101111:     // JAL 
+                int32_t destination = static_cast<int32_t>(processor.read_pc()) + this->offset();
+                processor.write_pc( static_cast<uint32_t>( destination ) );
+                break;
+        }
+}
+
