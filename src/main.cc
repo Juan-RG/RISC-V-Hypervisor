@@ -8,7 +8,7 @@
 #include <iomanip>
 #include <cstdint>
 
-typedef inst_t uint32_t;
+//typedef uint32_t uint32_t;
 
 /*Instrucciones
   0:   fe010113                addi    sp,sp,-32                   imm[11:0] rs1 000 rd 0010011 ADDI                 
@@ -22,21 +22,24 @@ typedef inst_t uint32_t;
   54:   0000006f                j       54 <main+0x54>             imm[20|10:1|11|19:12] rd 1101111 JAL
 */
 
-const std::map<inst_t, type> handlers = {
+
+
+using namespace instrs;
+using namespace mem;
+
+
+std::map<uint32_t, type> handlers = {
    {0b0000000, type::base},   // nop
    {0b0010011, type::i},      // addi
    {0b0100011, type::s},      // store word
    {0b0110111, type::u},      // lui Load Upper Immediate U
    {0b0000011, type::i},      // lw Load Word
-   {0b0010011, type::base},   // slli
+   {0b0010011, type::i},      // slli
    {0b0110011, type::r},      // add
    {0b0010011, type::i},      // li
    {0b1100011, type::b},      // bge
    {0b1101111, type::j}       // j
 };
-
-using namespace instrs;
-using namespace mem;
 
 int main(int argc, char *argv[])
 {
@@ -66,10 +69,10 @@ int main(int argc, char *argv[])
    do
    {
        pc = proc.read_pc();   
-/*
-       auto instr = mem.read<instrs::instruction>(pc);
-       std::cout << std::setfill('0') << std::setw(8) << std::hex << instr.opcode() << '\n'; 
-*/
+
+    auto instr = mem.read<instrs::instruction>(pc);
+    std::cout << std::setfill('0') << std::setw(8) << std::hex << instr.opcode() << '\n'; 
+
 
 /*Instrucciones
 
@@ -91,46 +94,44 @@ int main(int argc, char *argv[])
 
        
         uint32_t binaryInstr = mem.read<uint32_t>(pc);
-        auto opcode = binaryInstr & 0x7F;
+        uint32_t opcode = binaryInstr & 0x7F;
+        instruction* instr;
         switch (handlers[opcode])
         {
-            case type::base:
-                auto ins = new intruction(binaryInstr);
-                ins.execute();
+           // case type::base:
+            //    instr = new intruction(binaryInstr);
+                //ins.execute();
             case type::r:
-                auto ins = new r_instruction(binaryInstr);
-                ins.execute(proc, mem);
+                instr = new r_instruction(binaryInstr);
+                //ins.execute(proc, mem);
                 break;
             case type::i:
-                auto ins = new i_instruction(binaryInstr);
-                ins.execute(proc, mem);
+                instr = new i_instruction(binaryInstr);
+                //ins.execute(proc, mem);
                 break;
             case type::s:    
-                auto ins = new s_instruction(binaryInstr);
-                ins.execute(proc, mem);
+                instr = new s_instruction(binaryInstr);
+                //ins.execute(proc, mem);
                 break;
             case type::b:
-                auto ins = new b_instruction(binaryInstr);
-                ins.execute(proc, mem);
+                instr = new b_instruction(binaryInstr);
+                //ins.execute(proc, mem);
                 break;
             case type::u:
-                auto ins = new u_instruction(binaryInstr);
-                ins.execute(proc, mem);
+                instr = new u_instruction(binaryInstr);
+                //ins.execute(proc, mem);
                 break;
             case type::j:
-                auto ins = new j_instruction(binaryInstr);
-                ins.execute(proc, mem);
+                instr = new j_instruction(binaryInstr);
+                //ins.execute(proc, mem);
                 break;
-            case default:
+            default:
                 std::cerr << "Unexpected Opcode detected" << opcode << std::endl;
         }
-        
-
-
-/*        instr.execute(proc);
+        instr->execute(proc, mem);
         exec_instrs++;
         next_pc = proc.next_pc();
-  */
+        
    } while (next_pc != pc); // look for while(1) in the code
 
    std::cout << "Number of executed instructions: " << exec_instrs << std::endl;

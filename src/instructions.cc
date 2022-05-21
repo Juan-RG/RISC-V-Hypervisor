@@ -28,7 +28,7 @@ void i_instruction::execute(processor &proc, memory &mem)
 
         case 2:
             // LW
-            proc.write_reg(_rd, proc.read_mem(_valueRS + _imm));
+            proc.write_reg(_rd, mem.read<uint32_t>(static_cast<uint32_t>(_valueRS + _imm)));
             break;
     }
 }
@@ -36,7 +36,6 @@ void i_instruction::execute(processor &proc, memory &mem)
 void s_instruction::execute(processor &proc, memory &mem)
 {
     uint8_t _funct = this->funct3();
-    uint8_t _rd = this->rd();
     uint8_t _rs = this->rs1();
     uint8_t _rs2 = this->rs2();
 
@@ -54,6 +53,7 @@ void s_instruction::execute(processor &proc, memory &mem)
 
 
  void u_instruction::execute(processor &proc, memory &mem){
+        mem.read<uint32_t>(0);
         uint8_t _funct = this->opcode();
         uint8_t _rd = this->rd();    
         switch (_funct)
@@ -67,11 +67,12 @@ void s_instruction::execute(processor &proc, memory &mem)
  }
 
  void r_instruction::execute(processor &proc, memory &mem){
+        mem.read<uint32_t>(0);
         uint8_t _funct = this->funct3();
         uint8_t _rd = this->rd();
         uint8_t _rs = this->rs1();
         uint8_t _rs2 = this->rs2();
-        uint8_t _funct7 = this->funct7();
+        //uint8_t _funct7 = this->funct7();
 
         switch (_funct)
         {
@@ -86,6 +87,7 @@ void s_instruction::execute(processor &proc, memory &mem)
 
  }
  void b_instruction::execute(processor &proc, memory &mem){
+        mem.read<uint32_t>(0);
         uint8_t _funct = this->funct3();
         uint8_t _rs = this->rs1();
         uint8_t _rs2 = this->rs2();
@@ -95,20 +97,22 @@ void s_instruction::execute(processor &proc, memory &mem)
         case 5:
             //BGE
             if(proc.read_reg(_rs) >= proc.read_reg(_rs2)){
-                proc.set_pc(proc.get_pc() + _imm);
+                proc.write_pc(proc.read_pc() + _imm);
             }
             break;
+        }
  }
 // ...
 
 void j_instruction::execute(processor &proc, memory &mem)   {
+        mem.read<uint32_t>(0);
         uint8_t _funct = this->opcode();
-        uint8_t _rd = this->rd();
+        //uint8_t _rd = this->rd();
         switch (_funct)
         {
             case 0b1101111:     // JAL 
-                int32_t destination = static_cast<int32_t>(processor.read_pc()) + this->offset();
-                processor.write_pc( static_cast<uint32_t>( destination ) );
+                int32_t destination = static_cast<int32_t>(proc.read_pc()) + this->offset();
+                proc.write_pc( static_cast<uint32_t>( destination ) );
                 break;
         }
 }
