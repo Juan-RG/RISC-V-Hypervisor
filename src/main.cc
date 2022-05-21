@@ -55,8 +55,8 @@ int main(int argc, char *argv[])
   20:   fe842783                lw      a5,-24(s0)                 imm[11:0] rs1 010 rd 0000011 LW
   18:   000017b7                lui     a5,0x1                     imm[31:12] rd 0110111 LUI
   24:   00279793                slli    a5,a5,0x2                  0000000 shamt rs1 001 rd 0010011 SLLI
-
   28:   00f707b3                add     a5,a4,a5                   0000000 rs2 rs1 000 rd 0110011 ADD
+
   4c:   00300793                li      a5,3                       110000000001111 0010011     // ¿?¿? esto ni idea  010 imm[5] rd imm[4:0] 01  
   50:   fce7d4e3                bge     a5,a4,18 <main+0x18>       imm[12|10:5] rs2 rs1 101 imm[4:1|11] 1100011 BGE
   54:   0000006f                j       54 <main+0x54>             imm[20|10:1|11|19:12] rd 1101111 JAL
