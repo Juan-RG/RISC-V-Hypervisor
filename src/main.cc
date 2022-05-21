@@ -129,11 +129,16 @@ int main(int argc, char *argv[])
             default:
                 std::cerr << "Unexpected Opcode detected" << opcode << std::endl;
         }
+
+
         instr->execute(proc, mem);
         exec_instrs++;
         next_pc = proc.next_pc();
         
    } while (next_pc != pc); // look for while(1) in the code
 
+    auto instr1 = new i_instruction(4274267907);
+    instr1->execute(proc, mem);
+    printf("%d\n", proc.read_reg(14)); 
    std::cout << "Number of executed instructions: " << exec_instrs << std::endl;
 }
