@@ -57,7 +57,7 @@ class i_instruction : public instruction {
     public:
         i_instruction(uint32_t bitstream) :
             instruction(bitstream, type::i) {
-            _Imm = bits(31, 1) ? 0xFFFFF800 : 0x0;
+            _imm = bits(31, 1) ? 0xFFFFF800 : 0x0;
             _imm |= bits(20, 12);
         }
        // ~i_instruction() override {}	
@@ -99,28 +99,38 @@ class u_instruction : public instruction {
         u_instruction(uint32_t bitstream) :
             instruction(bitstream, type::u) {
             _imm = 0x0;
-            _imm |= bits(12, 20);
+            _imm |= bits(12, 20) << 12;
         }
-         constexpr uint8_t opcode() const { return bits(0, 7); }
+        constexpr uint8_t opcode() const { return bits(0, 7); }
         constexpr uint8_t rd() const { return bits(7, 5); }
         constexpr uint32_t imm() const { return bits(12, 20); } // imm[31:12]
         
         void execute(processor &proc, memory &mem);
 };
 
-/*
+
 class b_instruction : public instruction {
+    private:
+        int32_t _imm;    
     public:
         b_instruction(uint32_t bitstream) :
-            instruction(bitstream, type::b) {}
-        constexpr uint8_t imm() const { return bits(7, 5); } // imm[4:1|11] 
+            instruction(bitstream, type::b) {
+            _imm = bits(31, 1) ? 0xFFFFF800 : 0x0;
+            //bits(7, 1);
+            _imm |= bits(8, 4) << 1;
+            _imm |= bits(25, 6) << 5;
+            _imm |= bits(7, 1) << 11;
+            _imm |= bits(31, 1) << 12;
+        }
+        //constexpr uint8_t imm() const { return bits(7, 5); } // imm[4:1|11] 
         constexpr uint8_t funct3() const { return bits(12, 3); }
         constexpr uint8_t rs1() const { return bits(15, 5); }
         constexpr uint8_t rs2() const { return bits(20, 5); }
-        constexpr uint32_t imm() const { return bits(25, 7); } // imm[12|10:5] 
+        void execute(processor &proc, memory &mem);
+        //constexpr uint32_t imm() const { return bits(25, 7); } // imm[12|10:5] 
 };
 
-
+/*
 
 class j_instruction : public instruction {
     public:

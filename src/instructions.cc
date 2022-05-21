@@ -64,6 +64,40 @@ void s_instruction::execute(processor &proc, memory &mem)
                 break;
         }
 
- }   
+ }
+
+ void r_instruction::execute(processor &proc, memory &mem){
+        uint8_t _funct = this->funct3();
+        uint8_t _rd = this->rd();
+        uint8_t _rs = this->rs1();
+        uint8_t _rs2 = this->rs2();
+        uint8_t _funct7 = this->funct7();
+
+        switch (_funct)
+        {
+        case 0:
+            //ADD
+            proc.write_reg(_rd, proc.read_reg(_rs) + proc.read_reg(_rs2));
+            break;
+        
+        default:
+            break;
+        }
+
+ }
+ void b_instruction::execute(processor &proc, memory &mem){
+        uint8_t _funct = this->funct3();
+        uint8_t _rs = this->rs1();
+        uint8_t _rs2 = this->rs2();
+
+        switch (_funct)
+        {
+        case 5:
+            //BGE
+            if(proc.read_reg(_rs) >= proc.read_reg(_rs2)){
+                proc.set_pc(proc.get_pc() + _imm);
+            }
+            break;
+ }
 // ...
 
