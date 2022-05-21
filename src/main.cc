@@ -70,8 +70,8 @@ int main(int argc, char *argv[])
    {
        pc = proc.read_pc();   
 
-    auto instr = mem.read<instrs::instruction>(pc);
-    std::cout << std::setfill('0') << std::setw(8) << std::hex << instr.opcode() << '\n'; 
+
+    //std::cout << std::setfill('0') << std::setw(8) << std::hex << instr.opcode() << '\n'; 
 
 
 /*Instrucciones
@@ -94,6 +94,7 @@ int main(int argc, char *argv[])
 
        
         uint32_t binaryInstr = mem.read<uint32_t>(pc);
+        std::cout << std::setfill('0') << std::setw(8) << std::hex << binaryInstr << '\n'; 
         uint32_t opcode = binaryInstr & 0x7F;
         instruction* instr;
         switch (handlers[opcode])

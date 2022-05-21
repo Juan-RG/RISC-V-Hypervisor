@@ -97,7 +97,7 @@ void s_instruction::execute(processor &proc, memory &mem)
         case 5:
             //BGE
             if(proc.read_reg(_rs) >= proc.read_reg(_rs2)){
-                proc.write_pc(proc.read_pc() + _imm);
+                proc.write_pc((proc.read_pc() - 4) + _imm);
             }
             break;
         }
@@ -108,12 +108,26 @@ void j_instruction::execute(processor &proc, memory &mem)   {
         mem.read<uint32_t>(0);
         uint8_t _funct = this->opcode();
         //uint8_t _rd = this->rd();
+
         switch (_funct)
         {
-            case 0b1101111:     // JAL 
-                int32_t destination = static_cast<int32_t>(proc.read_pc()) + this->offset();
+            case 0b1101111:     // JAL
+            
+            //proc.write_pc((proc.read_pc() + 4) + _offset);
+            proc.write_pc((proc.read_pc() - 4) + _offset);
+            break;
+        }
+
+
+
+
+            /* 
+                printf("ddd %d\n", (static_cast<int32_t>(proc.read_pc()) + 4 ));
+                int32_t destination = (static_cast<int32_t>(proc.read_pc()) + 4 ) + this->offset();
+                printf("ddd %d\n", destination);
                 proc.write_pc( static_cast<uint32_t>( destination ) );
                 break;
-        }
+        */
+         std::cout << "fin" << '\n'; 
 }
 

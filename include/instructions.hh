@@ -141,8 +141,11 @@ class j_instruction : public instruction {
     public:
         j_instruction(uint32_t bitstream) :
             instruction(bitstream, type::j) {
-                _offset = bits(31, 1) ? 0xFFF00000 : 0x0;
-                _offset |= bits(12, 20);
+                _offset = bits(31, 1) ? 0xFFE00000 : 0x0;
+                _offset |= bits(21, 10) << 1;
+                _offset |= bits(20, 1) << 11;
+                _offset |= bits(12, 8) << 12;
+                _offset |= bits(31, 1) << 24;
         }
         ~j_instruction() override {}
         constexpr uint8_t rd() const { return bits(7, 5); }
