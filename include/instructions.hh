@@ -56,13 +56,8 @@ class i_instruction : public instruction {
     public:
         i_instruction(uint32_t bitstream) :
             instruction(bitstream, type::i) {
-            //_imm = bits(31, 1) ? 0xFFFFF800 : 0x0;
-            _imm = bits(31, 1) ? 0xFFFFF000 : 0x0;
-/*            if(bits(31, 1) == 1){
-                _imm = 0xFFFFF000;//FFFF F000  0xFFFFF800
-            }
-*/
-            _imm |= bits(20,12);
+            _Imm = bits(31, 1) ? 0xFFFFF800 : 0x0;
+            _imm |= bits(20, 12);
         }
        // ~i_instruction() override {}	
         constexpr uint8_t rd() const { return bits(7, 5); }
