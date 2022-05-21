@@ -56,10 +56,12 @@ class i_instruction : public instruction {
     public:
         i_instruction(uint32_t bitstream) :
             instruction(bitstream, type::i) {
-            _imm = bits(31, 1) ? 0xFFFFF800 : 0x0;
-            if(bits(31, 1) == 1){
+            //_imm = bits(31, 1) ? 0xFFFFF800 : 0x0;
+            _imm = bits(31, 1) ? 0xFFFFF000 : 0x0;
+/*            if(bits(31, 1) == 1){
                 _imm = 0xFFFFF000;//FFFF F000  0xFFFFF800
             }
+*/
             _imm |= bits(20,12);
         }
        // ~i_instruction() override {}	
@@ -78,11 +80,12 @@ class s_instruction : public instruction {
         s_instruction(uint32_t bitstream) :
         instruction(bitstream, type::s) {
             _imm = bits(31, 1) ? 0xFFFFF800 : 0x0;
-            if(bits(31, 1) == 1){
+/*            if(bits(31, 1) == 1){
                 _imm = 0xFFFFF800;
             }
-        _imm |= bits(7,5);
-        _imm |= (bits(25,7) << 5);
+*/
+            _imm |= bits(7,5);
+            _imm |= (bits(25,7) << 5);
 
         }
         constexpr uint8_t funct3() const { return bits(12, 3); }
@@ -91,6 +94,24 @@ class s_instruction : public instruction {
         constexpr uint32_t imm() const { return _imm; } // imm[11:5] 
         void execute(processor &proc, memory &mem);
 };
+
+
+class u_instruction : public instruction {
+    private:
+        int32_t _imm;
+    public:
+        u_instruction(uint32_t bitstream) :
+            instruction(bitstream, type::u) {
+            _imm = 0x0;
+            _imm |= bits(12, 20);
+        }
+         constexpr uint8_t opcode() const { return bits(0, 7); }
+        constexpr uint8_t rd() const { return bits(7, 5); }
+        constexpr uint32_t imm() const { return bits(12, 20); } // imm[31:12]
+        
+        void execute(processor &proc, memory &mem);
+};
+
 /*
 class b_instruction : public instruction {
     public:
@@ -103,13 +124,7 @@ class b_instruction : public instruction {
         constexpr uint32_t imm() const { return bits(25, 7); } // imm[12|10:5] 
 };
 
-class u_instruction : public instruction {
-    public:
-        r_instruction(uint32_t bitstream) :
-            instruction(bitstream, type::u) {}
-        constexpr uint8_t rd() const { return bits(7, 5); }
-        constexpr uint32_t imm() const { return bits(20, 12); } // imm[31:12]
-};
+
 
 class j_instruction : public instruction {
     public:
