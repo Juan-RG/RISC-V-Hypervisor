@@ -22,7 +22,7 @@ void i_instruction::execute(processor &proc, memory &mem)
             proc.write_reg(_rd, _valueRS + _imm);
             break;
         case 1:
-        //SLLI //Desplaza el valor de RS con los 4 bits
+        //SLLI //Shift RS 
             proc.write_reg(_rd, _valueRS << bits(20, 5));
             break;
 
@@ -72,7 +72,6 @@ void s_instruction::execute(processor &proc, memory &mem)
         uint8_t _rd = this->rd();
         uint8_t _rs = this->rs1();
         uint8_t _rs2 = this->rs2();
-        //uint8_t _funct7 = this->funct7();
 
         switch (_funct)
         {
@@ -107,27 +106,12 @@ void s_instruction::execute(processor &proc, memory &mem)
 void j_instruction::execute(processor &proc, memory &mem)   {
         mem.read<uint32_t>(0);
         uint8_t _funct = this->opcode();
-        //uint8_t _rd = this->rd();
 
         switch (_funct)
         {
             case 0b1101111:     // JAL
-            
-            //proc.write_pc((proc.read_pc() + 4) + _offset);
             proc.write_pc((proc.read_pc() - 4) + _offset);
             break;
         }
-
-
-
-
-            /* 
-                printf("ddd %d\n", (static_cast<int32_t>(proc.read_pc()) + 4 ));
-                int32_t destination = (static_cast<int32_t>(proc.read_pc()) + 4 ) + this->offset();
-                printf("ddd %d\n", destination);
-                proc.write_pc( static_cast<uint32_t>( destination ) );
-                break;
-        */
-         std::cout << "fin" << '\n'; 
 }
 
